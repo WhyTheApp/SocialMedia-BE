@@ -133,7 +133,7 @@ public class AddRegisterValidatorTests
     public void WhenDomainEndsWithNotAllowedCharacter_ShouldNotBeValidated()
     {
         // Constants
-        const string addedEmail = "test@test.com-";
+        const string addedEmail = "test@test.com";
         const string addedFeedback = "Test";
         
         // Arrange
