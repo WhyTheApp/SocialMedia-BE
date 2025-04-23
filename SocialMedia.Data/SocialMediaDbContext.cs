@@ -13,7 +13,7 @@ public class SocialMediaDbContext : DbContext
     {
     }
 
-    public DbSet<Register> Registers { get; set; }
+    public virtual DbSet<Register> Registers { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
