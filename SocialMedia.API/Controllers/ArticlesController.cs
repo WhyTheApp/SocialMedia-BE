@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SocialMedia.API.Requests.Articles;
 using SocialMedia.API.Requests.PagingAndFiltering;
@@ -16,6 +17,7 @@ public class ArticlesController : ControllerBase
         _service = exampleService;
     }
     
+    [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpPost("add")]
     public async Task<IActionResult> AddRequest([FromBody] AddArticleRequest request)
     {
@@ -51,7 +53,22 @@ public class ArticlesController : ControllerBase
     {
         try
         {
-            var article = await _service.GetFilteredArticles(request.ToFilterObjectDTO());
+            var articles = await _service.GetFilteredArticles(request.ToFilterObjectDTO());
+            
+            return Ok(articles);
+        }
+        catch
+        {
+            return BadRequest();
+        }
+    }
+    
+    [HttpGet("get-featured")]
+    public async Task<IActionResult> GetFeaturedArticle()
+    {
+        try
+        {
+            var article = await _service.GetFeaturedArticle();
             
             return Ok(article);
         }

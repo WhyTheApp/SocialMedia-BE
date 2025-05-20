@@ -48,4 +48,14 @@ public class ArticlesService: IArticlesService
         
         return articles;
     }
+
+    public async Task<Article> GetFeaturedArticle()
+    {
+        var article = await _dbContext.FeaturedArticles
+            .Include(artocle => artocle.Article)
+            .OrderByDescending(article => article.FeaturedArticleId)
+            .FirstOrDefaultAsync();
+
+        return article.Article;
+    }
 }
