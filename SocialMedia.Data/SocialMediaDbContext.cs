@@ -14,6 +14,7 @@ public class SocialMediaDbContext : DbContext
     }
 
     public virtual DbSet<Register> Registers { get; set; }
+    public virtual DbSet<Article> Articles { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

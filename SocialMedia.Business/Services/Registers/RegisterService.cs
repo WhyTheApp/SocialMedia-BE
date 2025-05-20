@@ -1,10 +1,8 @@
-using System.Text.RegularExpressions;
-using SocialMedia.Business.Constants;
 using SocialMedia.Business.Models;
 using SocialMedia.Business.Models.Registers;
 using SocialMedia.Data;
 
-namespace SocialMedia.Business.Services.Example;
+namespace SocialMedia.Business.Services.Registers;
 
 public class RegisterService : IRegisterService
 {

@@ -7,7 +7,6 @@ using Moq.EntityFrameworkCore;
 using NUnit.Framework;
 using SocialMedia.API.Requests;
 using SocialMedia.Business.Models.Registers;
-using SocialMedia.Business.Services.Example;
 using SocialMedia.Data;
 using SocialMedia.Data.Models;
 

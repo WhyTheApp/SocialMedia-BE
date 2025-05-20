@@ -1,6 +1,6 @@
-using SocialMedia.Business.Services.Example;
 using Microsoft.AspNetCore.Mvc;
 using SocialMedia.API.Requests;
+using SocialMedia.Business.Services.Registers;
 
 namespace SocialMedia.API.Controllers;
 
