@@ -52,10 +52,17 @@ public class ArticlesService: IArticlesService
     public async Task<Article> GetFeaturedArticle()
     {
         var article = await _dbContext.FeaturedArticles
-            .Include(artocle => artocle.Article)
+            .Include(article => article.Article)
             .OrderByDescending(article => article.FeaturedArticleId)
             .FirstOrDefaultAsync();
 
         return article.Article;
+    }
+
+    public async Task<int> GetLatestArticleId()
+    {
+        var articleId = _dbContext.Articles.Max(article => article.ArticleId);
+
+        return articleId;
     }
 }

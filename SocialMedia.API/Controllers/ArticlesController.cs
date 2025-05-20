@@ -34,11 +34,26 @@ public class ArticlesController : ControllerBase
     }
     
     [HttpGet("get-article")]
-    public async Task<IActionResult> AddRequest([FromQuery] int articleId)
+    public async Task<IActionResult> GetRequest([FromQuery] int articleId)
     {
         try
         {
             var article = await _service.GetArticle(articleId);
+            
+            return Ok(article);
+        }
+        catch
+        {
+            return BadRequest();
+        }
+    }
+    
+    [HttpGet("get-latest-article-id")]
+    public async Task<IActionResult> GetLatestArticleId()
+    {
+        try
+        {
+            var article = await _service.GetLatestArticleId();
             
             return Ok(article);
         }

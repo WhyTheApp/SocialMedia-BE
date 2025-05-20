@@ -10,5 +10,6 @@ public interface IArticlesService
     Task<Article> GetArticle(int articleId);
     Task<FilterResponse<Article>> GetFilteredArticles(FilterObjectDTO request);
     Task<Article> GetFeaturedArticle();
+    Task<int> GetLatestArticleId();
 }
 
