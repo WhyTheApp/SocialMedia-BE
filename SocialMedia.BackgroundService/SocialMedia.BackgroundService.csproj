@@ -7,13 +7,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Reference Include="Microsoft.Extensions.Hosting.Abstractions">
-        <HintPath>..\..\..\.nuget\packages\microsoft.aspnetcore.app.ref\8.0.14\ref\net8.0\Microsoft.Extensions.Hosting.Abstractions.dll</HintPath>
-      </Reference>
+      <ProjectReference Include="..\SocialMedia.Data\SocialMedia.Data.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\SocialMedia.Data\SocialMedia.Data.csproj" />
+      <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.0-preview.4.25258.110" />
     </ItemGroup>
 
 </Project>
