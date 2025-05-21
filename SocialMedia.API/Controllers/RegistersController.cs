@@ -1,6 +1,7 @@
-using SocialMedia.Business.Services.Example;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SocialMedia.API.Requests;
+using SocialMedia.Business.Services.Registers;
 
 namespace SocialMedia.API.Controllers;
 
@@ -30,6 +31,7 @@ public class RegistersController : ControllerBase
         }
     }
     
+    [Authorize(AuthenticationSchemes = "Bearer")]
     [HttpGet("getAll")]
     public async Task<IActionResult> GetAllRequests()
     {

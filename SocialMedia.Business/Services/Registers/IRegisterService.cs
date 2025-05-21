@@ -1,6 +1,6 @@
 using SocialMedia.Business.Models.Registers;
 
-namespace SocialMedia.Business.Services.Example;
+namespace SocialMedia.Business.Services.Registers;
 
 public interface IRegisterService
 {
