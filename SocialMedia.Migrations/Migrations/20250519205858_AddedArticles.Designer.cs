@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SocialMedia.Data;
@@ -11,9 +12,11 @@ using SocialMedia.Data;
 namespace SocialMedia.Migrations.Migrations
 {
     [DbContext(typeof(SocialMediaDbContext))]
-    partial class SocialMediaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250519205858_AddedArticles")]
+    partial class AddedArticles
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -52,29 +55,6 @@ namespace SocialMedia.Migrations.Migrations
                     b.ToTable("Articles");
                 });
 
-            modelBuilder.Entity("SocialMedia.Data.Models.FeaturedArticle", b =>
-                {
-                    b.Property<int>("FeaturedArticleId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("FeaturedArticleId"));
-
-                    b.Property<int>("ArticleId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("FeaturedArticleId");
-
-                    b.HasIndex("ArticleId");
-
-                    b.HasIndex("Date");
-
-                    b.ToTable("FeaturedArticles");
-                });
-
             modelBuilder.Entity("SocialMedia.Data.Models.Register", b =>
                 {
                     b.Property<int>("Id")
@@ -94,17 +74,6 @@ namespace SocialMedia.Migrations.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Registers");
-                });
-
-            modelBuilder.Entity("SocialMedia.Data.Models.FeaturedArticle", b =>
-                {
-                    b.HasOne("SocialMedia.Data.Models.Article", "Article")
-                        .WithMany()
-                        .HasForeignKey("ArticleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Article");
                 });
 #pragma warning restore 612, 618
         }
