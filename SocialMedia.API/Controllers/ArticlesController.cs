@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SocialMedia.API.Requests.Articles;
-using SocialMedia.API.Requests.PagingAndFiltering;
 using SocialMedia.Business.Services.Articles;
 
 namespace SocialMedia.API.Controllers;
