@@ -16,5 +16,6 @@ public static class ServiceExtensions
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped(typeof(IFilterService<>), typeof(FilterService<>));
         services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+        services.AddScoped<IEmailerService, EmailerService>();
     }
 }

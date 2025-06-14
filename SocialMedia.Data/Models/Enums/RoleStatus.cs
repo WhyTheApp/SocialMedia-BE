@@ -2,6 +2,7 @@ namespace SocialMedia.Data.Models.Enums;
 
 public enum RoleStatus
 {
-    User = 0,
-    Admin = 1
-}
+    Unverified = 0,
+    User = 1,
+    Admin = 2
+}   

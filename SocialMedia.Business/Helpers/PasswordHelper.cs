@@ -47,13 +47,21 @@ public class PasswordHelper
 
     private static bool HasSpecialChar(string password)
     {
-        var specialChars = 
-            "!@#$%^&*(),.?" +    // common punctuation
-            "\"{}|<>_" +         // quotes, braces, pipe, angle brackets, underscore
-            "\\-+=[]" +          // backslash, dash, plus, equals, brackets
-            "\\:;'/~`";          // colon, semicolon, single quote, slash, tilde, backtick
+        var group1 = "!@#$%^&*(),.?";      // common punctuation
+        var group2 = "\"{}|<>_";           // quotes, braces, pipe, angle brackets, underscore
+        var group3 = "-+=[]";              // dash, plus, equals, brackets
+        var group4 = ":;'/~`\\";           // colon, semicolon, single quote, slash, tilde, backtick, backslash
 
-        var specialCharPattern = new Regex("[" + specialChars + "]");
+        var allSpecialChars = group1 + group2 + group3 + group4;
+
+        string escaped = allSpecialChars
+            .Replace(@"\", @"\\")  // escape backslash
+            .Replace("-", @"\-")   // escape dash
+            .Replace("[", @"\[")   // escape [
+            .Replace("]", @"\]");  // escape ]
+
+        var specialCharPattern = new Regex("[" + escaped + "]");
+
         return specialCharPattern.IsMatch(password);
     }
 }

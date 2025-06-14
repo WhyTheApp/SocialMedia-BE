@@ -17,6 +17,7 @@ public class SocialMediaDbContext : DbContext
     public virtual DbSet<FeaturedArticle> FeaturedArticles { get; set; }
     public virtual DbSet<User> Users { get; set; }
     public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
+    public virtual DbSet<MailVerification> MailVerifications { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -19,12 +19,14 @@ public class AuthenticationService : IAuthenticationService
     SocialMediaDbContext _dbContext;
     private IPasswordHasher<User> _hasher;
     private IConfiguration _configuration;
+    private IEmailerService _emailerService;
     
-    public AuthenticationService(SocialMediaDbContext dbContext, IPasswordHasher<User> hasher, IConfiguration configuration)
+    public AuthenticationService(SocialMediaDbContext dbContext, IPasswordHasher<User> hasher, IConfiguration configuration, IEmailerService emailerService)
     {
         _dbContext = dbContext;
         _hasher = hasher;
         _configuration = configuration;
+        _emailerService = emailerService;
     }
     
     public async Task<LoginResponse> LoginLocalUserAsync(LocalLoginRequestDTO request)
@@ -66,7 +68,7 @@ public class AuthenticationService : IAuthenticationService
             Username = request.Username,
             Email = request.Email,
             PasswordHash = String.Empty,
-            RoleStatus = RoleStatus.User,
+            RoleStatus = RoleStatus.Unverified,
             CreatedAt = DateTime.UtcNow,
             LastLoginAt = DateTime.UtcNow,
             IsEmailConfirmed = false,
@@ -79,6 +81,9 @@ public class AuthenticationService : IAuthenticationService
         await _dbContext.Users
             .AddAsync(userToAdd);
         await _dbContext.SaveChangesAsync();
+        
+        await SendVerificationCodeAsync(userToAdd.Id, userToAdd.Username, userToAdd.Email);
+
         
         return new LoginResponse
         {
@@ -129,9 +134,47 @@ public class AuthenticationService : IAuthenticationService
 
         return new RefreshTokenResponse
         {
-            JwtToken = GenerateJwtToken(user),
+            Token = GenerateJwtToken(user),
             RefreshToken = GenerateAndSaveRefreshToken(user.Id)
         };
+    }
+
+    public async Task<LoginResponse> VerifyEmail(VerifyEmailRequestDTO request)
+    {
+        var mailVerification = await _dbContext.MailVerifications.FirstOrDefaultAsync(mailVerification =>
+            mailVerification.UserId == request.UserId && mailVerification.Expires > DateTime.UtcNow);
+
+        if(mailVerification == null)
+            throw new InvalidOperationException();
+        
+        var user = await _dbContext.Users.FirstOrDefaultAsync(user => user.Id == mailVerification.UserId);
+        user.RoleStatus = RoleStatus.User;
+
+        _dbContext.MailVerifications.Remove(mailVerification);
+        await _dbContext.SaveChangesAsync();
+
+        return new LoginResponse
+        {
+            Id = user.Id,
+            Username = user.Username,
+            Token = GenerateJwtToken(user),
+        };
+    }
+    
+    private async Task SendVerificationCodeAsync(Guid userId, string username, string email)
+    {
+        var random = new Random();
+        string code = random.Next(1000, 10000).ToString();
+      
+        await _emailerService.SendVerificationEmailAsync(username, email, code);
+
+        await _dbContext.MailVerifications.AddAsync(new MailVerification
+        {
+            Expires = DateTime.UtcNow + TimeSpan.FromMinutes(30),
+            UserId = userId,
+            Code = code
+        });
+        await _dbContext.SaveChangesAsync();
     }
     
     private async Task<bool> IsUserAlreadyExistent(string email, string username)
@@ -163,13 +206,17 @@ public class AuthenticationService : IAuthenticationService
     {
         var claims = new[]
         {
-            new Claim(ClaimTypes.Name, user.Username),
-            new Claim(ClaimTypes.Role, user.RoleStatus.ToString()), 
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+            new Claim("name", user.Username), 
+            new Claim("role", user.RoleStatus.ToString()),
             new Claim(JwtRegisteredClaimNames.Iss, _configuration["Jwt:Issuer"]),
             new Claim(JwtRegisteredClaimNames.Aud, _configuration["Jwt:Audience"]),
+            new Claim(JwtRegisteredClaimNames.Iat, 
+                new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64),
             new Claim(JwtRegisteredClaimNames.Exp,
-                new DateTimeOffset(DateTime.UtcNow.AddHours(1)).ToUnixTimeSeconds().ToString())
+                new DateTimeOffset(DateTime.UtcNow.AddHours(1)).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
         };
+
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

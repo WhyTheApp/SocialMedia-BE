@@ -23,4 +23,11 @@ public static class AuthenticationExtensions
             Password = request.Password,
             KeepMeLoggedIn = request.KeepMeLoggedIn,
         };
+
+    public static VerifyEmailRequestDTO ToVerifyEmailRequestDTO(this VerifyEmailRequest request) =>
+        new VerifyEmailRequestDTO
+        {
+            UserId = request.UserId,
+            Code = request.Code,
+        };
 }

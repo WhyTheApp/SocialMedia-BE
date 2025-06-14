@@ -59,6 +59,21 @@ public class AuthenticationController : ControllerBase
         }
     }
     
+    [HttpPost("verify-email")]
+    public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailRequest request)
+    {
+        try
+        {
+            var response = await _authenticationService.VerifyEmail(request.ToVerifyEmailRequestDTO());
+            
+            return Ok(response);
+        }
+        catch
+        {
+            return BadRequest();
+        }
+    }
+    
     [HttpPost("refresh-token")]
     public async Task<IActionResult> RefreshToken()
     {
@@ -76,6 +91,6 @@ public class AuthenticationController : ControllerBase
         };
         Response.Cookies.Append("refreshToken", response.RefreshToken, cookieOptions);
         
-        return Ok(new { token = response.JwtToken });
+        return Ok(new { token = response.Token });
     }
 }

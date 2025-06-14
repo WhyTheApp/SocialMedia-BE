@@ -39,6 +39,6 @@ public class UsersConfiguration: IEntityTypeConfiguration<User>
             .HasDefaultValue(false);
 
         builder.Property(u => u.RoleStatus)
-            .HasDefaultValue(RoleStatus.User);
+            .HasDefaultValue(RoleStatus.Unverified);
     }
 }

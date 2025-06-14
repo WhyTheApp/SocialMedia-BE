@@ -8,6 +8,8 @@ public interface IAuthenticationService
     Task<LoginResponse> LoginLocalUserAsync(LocalLoginRequestDTO request);
     Task<LoginResponse> RegisterLocalUser(LocalRegisterRequestDTO request);
     Task<RefreshTokenResponse> RefreshJWTToken(string refreshToken);
+    Task<LoginResponse> VerifyEmail(VerifyEmailRequestDTO request);
+
     string GenerateAndSaveRefreshToken(Guid userId, int size = 32);
 }
 
