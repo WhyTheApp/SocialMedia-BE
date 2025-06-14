@@ -1,14 +1,6 @@
-using FluentAssertions;
 using FluentValidation.TestHelper;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Moq;
-using Moq.EntityFrameworkCore;
 using NUnit.Framework;
 using SocialMedia.API.Requests;
-using SocialMedia.Business.Models.Registers;
-using SocialMedia.Data;
-using SocialMedia.Data.Models;
 
 namespace SocialMedia.Tests.RegisterTests.RegisterValidatorsTests;
 

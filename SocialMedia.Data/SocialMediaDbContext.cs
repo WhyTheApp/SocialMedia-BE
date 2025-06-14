@@ -2,7 +2,6 @@
 
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
-using SocialMedia.Data.Configurations;
 using SocialMedia.Data.Models;
 
 namespace SocialMedia.Data;
@@ -16,6 +15,9 @@ public class SocialMediaDbContext : DbContext
     public virtual DbSet<Register> Registers { get; set; }
     public virtual DbSet<Article> Articles { get; set; }
     public virtual DbSet<FeaturedArticle> FeaturedArticles { get; set; }
+    public virtual DbSet<User> Users { get; set; }
+    public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
+    public virtual DbSet<MailVerification> MailVerifications { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

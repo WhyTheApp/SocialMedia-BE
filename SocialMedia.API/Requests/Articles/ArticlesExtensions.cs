@@ -1,7 +1,6 @@
 using SocialMedia.API.Requests.PagingAndFiltering;
 using SocialMedia.Business.Models.Articles;
 using SocialMedia.Business.Models.PagingAndFiltering;
-using SocialMedia.Business.Models.Registers;
 
 namespace SocialMedia.API.Requests.Articles;
 

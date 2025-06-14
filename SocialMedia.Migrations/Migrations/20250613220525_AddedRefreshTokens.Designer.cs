@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SocialMedia.Data;
@@ -11,9 +12,11 @@ using SocialMedia.Data;
 namespace SocialMedia.Migrations.Migrations
 {
     [DbContext(typeof(SocialMediaDbContext))]
-    partial class SocialMediaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250613220525_AddedRefreshTokens")]
+    partial class AddedRefreshTokens
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,7 +52,7 @@ namespace SocialMedia.Migrations.Migrations
 
                     b.HasIndex("Date");
 
-                    b.ToTable("Articles", (string)null);
+                    b.ToTable("Articles");
                 });
 
             modelBuilder.Entity("SocialMedia.Data.Models.FeaturedArticle", b =>
@@ -72,30 +75,7 @@ namespace SocialMedia.Migrations.Migrations
 
                     b.HasIndex("Date");
 
-                    b.ToTable("FeaturedArticles", (string)null);
-                });
-
-            modelBuilder.Entity("SocialMedia.Data.Models.MailVerification", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("Expires")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("MailVerifications", (string)null);
+                    b.ToTable("FeaturedArticles");
                 });
 
             modelBuilder.Entity("SocialMedia.Data.Models.RefreshToken", b =>
@@ -124,7 +104,7 @@ namespace SocialMedia.Migrations.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RefreshTokens", (string)null);
+                    b.ToTable("RefreshTokens");
                 });
 
             modelBuilder.Entity("SocialMedia.Data.Models.Register", b =>
@@ -145,7 +125,7 @@ namespace SocialMedia.Migrations.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Registers", (string)null);
+                    b.ToTable("Registers");
                 });
 
             modelBuilder.Entity("SocialMedia.Data.Models.User", b =>
@@ -204,7 +184,7 @@ namespace SocialMedia.Migrations.Migrations
 
                     b.HasIndex("Provider", "ProviderId");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("SocialMedia.Data.Models.FeaturedArticle", b =>

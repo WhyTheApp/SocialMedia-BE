@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SocialMedia.API.Requests.Articles;
-using SocialMedia.API.Requests.PagingAndFiltering;
 using SocialMedia.Business.Services.Articles;
+using SocialMedia.Business.Services.Authentication;
 
 namespace SocialMedia.API.Controllers;
 
@@ -11,10 +11,12 @@ namespace SocialMedia.API.Controllers;
 public class ArticlesController : ControllerBase
 {
     public IArticlesService _service;
+    private IConfiguration configuration;
 
-    public ArticlesController(IArticlesService exampleService)
+    public ArticlesController(IArticlesService exampleService, IConfiguration configuration)
     {
         _service = exampleService;
+        this.configuration = configuration;
     }
     
     [Authorize(AuthenticationSchemes = "Bearer")]
@@ -51,6 +53,7 @@ public class ArticlesController : ControllerBase
     [HttpGet("get-latest-article-id")]
     public async Task<IActionResult> GetLatestArticleId()
     {
+        await new EmailerService(configuration).SendVerificationEmailAsync("Catalin Catalin", " letstalk@whythe.app", "2233");
         try
         {
             var article = await _service.GetLatestArticleId();
