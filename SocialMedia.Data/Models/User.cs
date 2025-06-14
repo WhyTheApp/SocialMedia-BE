@@ -13,5 +13,6 @@ public class User
     public DateTime? LastLoginAt { get; set; }
     public bool IsEmailConfirmed { get; set; } = false;
     public LoginProvider Provider { get; set; }
+    public List<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
     public string ProviderId { get; set; }
 }

@@ -1,9 +1,16 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using SocialMedia.Business.Models.Authentication;
 using SocialMedia.Data;
 using SocialMedia.Data.Models;
 using SocialMedia.Data.Models.Enums;
+using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
 namespace SocialMedia.Business.Services.Authentication;
 
@@ -11,11 +18,13 @@ public class AuthenticationService : IAuthenticationService
 {
     SocialMediaDbContext _dbContext;
     private IPasswordHasher<User> _hasher;
+    private IConfiguration _configuration;
     
-    public AuthenticationService(SocialMediaDbContext dbContext, IPasswordHasher<User> hasher)
+    public AuthenticationService(SocialMediaDbContext dbContext, IPasswordHasher<User> hasher, IConfiguration configuration)
     {
         _dbContext = dbContext;
         _hasher = hasher;
+        _configuration = configuration;
     }
     
     public async Task<LoginResponse> LoginLocalUserAsync(LocalLoginRequestDTO request)
@@ -40,7 +49,7 @@ public class AuthenticationService : IAuthenticationService
         {
             Id = user.Id,
             Username = user.Username,
-            Token = GetJWTToken(user)
+            Token = GenerateJwtToken(user)
         };
     }
     
@@ -75,13 +84,54 @@ public class AuthenticationService : IAuthenticationService
         {
             Id = userToAdd.Id,
             Username = userToAdd.Username,
-            Token = GetJWTToken(userToAdd)
+            Token = GenerateJwtToken(userToAdd)
         };
     }
-
-    private string GetJWTToken(User user)
+    
+    public string GenerateAndSaveRefreshToken(Guid userId, int size = 32)
     {
-        return String.Empty;
+        var randomNumber = new byte[size];
+        
+        using (var randomNumberGenerator = RandomNumberGenerator.Create())
+        {
+            randomNumberGenerator.GetBytes(randomNumber);
+        }
+        
+        var refreshToken = Convert.ToBase64String(randomNumber)
+            .Replace("+", "-")
+            .Replace("/", "_")
+            .Replace("=", "");
+            
+        var refreshTokenEntity = new RefreshToken
+        {
+            Token = refreshToken,
+            Expires = DateTime.UtcNow.AddDays(30),
+            IsRevoked = false,
+            UserId = userId
+        };
+        _dbContext.RefreshTokens.Add(refreshTokenEntity);
+        _dbContext.SaveChanges();
+
+        return refreshToken;
+    }
+
+    public async Task<RefreshTokenResponse> RefreshJWTToken(string refreshToken)
+    {
+        var validRefreshToken = await _dbContext.RefreshTokens
+            .FirstOrDefaultAsync(rt => rt.Token == refreshToken && !rt.IsRevoked && rt.Expires > DateTime.UtcNow);
+        
+        if(validRefreshToken == null)
+            throw new InvalidOperationException();
+        
+        validRefreshToken.IsRevoked = true;
+        var user = await _dbContext.Users
+            .FirstOrDefaultAsync(user => user.Id == validRefreshToken.UserId);
+
+        return new RefreshTokenResponse
+        {
+            JwtToken = GenerateJwtToken(user),
+            RefreshToken = GenerateAndSaveRefreshToken(user.Id)
+        };
     }
     
     private async Task<bool> IsUserAlreadyExistent(string email, string username)
@@ -107,5 +157,31 @@ public class AuthenticationService : IAuthenticationService
         }
         
         return uniqueId;
+    }
+    
+    private string GenerateJwtToken(User user)
+    {
+        var claims = new[]
+        {
+            new Claim(ClaimTypes.Name, user.Username),
+            new Claim(ClaimTypes.Role, user.RoleStatus.ToString()), 
+            new Claim(JwtRegisteredClaimNames.Iss, _configuration["Jwt:Issuer"]),
+            new Claim(JwtRegisteredClaimNames.Aud, _configuration["Jwt:Audience"]),
+            new Claim(JwtRegisteredClaimNames.Exp,
+                new DateTimeOffset(DateTime.UtcNow.AddHours(1)).ToUnixTimeSeconds().ToString())
+        };
+
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]));
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+        var token = new JwtSecurityToken(
+            issuer: _configuration["Jwt:Issuer"],
+            audience: _configuration["Jwt:Audience"],
+            claims: claims,
+            expires: DateTime.UtcNow.AddHours(1),
+            signingCredentials: creds
+        );
+
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }

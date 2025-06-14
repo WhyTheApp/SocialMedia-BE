@@ -21,5 +21,6 @@ public static class AuthenticationExtensions
         {
             EmailOrUsername = request.EmailOrUsername,
             Password = request.Password,
+            KeepMeLoggedIn = request.KeepMeLoggedIn,
         };
 }

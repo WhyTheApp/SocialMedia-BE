@@ -21,6 +21,20 @@ public class AuthenticationController : ControllerBase
         try
         {
             var response = await _authenticationService.LoginLocalUserAsync(request.ToLocalLoginRequestDTO());
+            var refreshToken = _authenticationService.GenerateAndSaveRefreshToken(response.Id);
+            
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Lax,
+            };
+            if (request.KeepMeLoggedIn)
+            {
+                cookieOptions.Expires = DateTime.UtcNow.AddDays(30);
+            }
+            
+            Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
             
             return Ok(response);
         }
@@ -43,5 +57,25 @@ public class AuthenticationController : ControllerBase
         {
             return BadRequest();
         }
+    }
+    
+    [HttpPost("refresh-token")]
+    public async Task<IActionResult> RefreshToken()
+    {
+        var token = Request.Cookies["refreshToken"];
+        if (string.IsNullOrEmpty(token))
+            return Unauthorized();
+
+        var response = await _authenticationService.RefreshJWTToken(token);
+        var cookieOptions = new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.Lax,
+            Expires = DateTime.UtcNow.AddDays(30)
+        };
+        Response.Cookies.Append("refreshToken", response.RefreshToken, cookieOptions);
+        
+        return Ok(new { token = response.JwtToken });
     }
 }
