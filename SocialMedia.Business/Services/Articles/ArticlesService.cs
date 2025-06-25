@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using SocialMedia.Business.Models.Articles;
 using SocialMedia.Business.Models.PagingAndFiltering;
 using SocialMedia.Business.Services.Filtering;
@@ -11,11 +13,13 @@ public class ArticlesService: IArticlesService
 {
     SocialMediaDbContext _dbContext;
     IFilterService<Article> _filterService;
+    private IConfiguration _configuration;
 
-    public ArticlesService(SocialMediaDbContext dbContext, IFilterService<Article> filterService)
+    public ArticlesService(SocialMediaDbContext dbContext, IFilterService<Article> filterService, IConfiguration configuration)
     {
         _dbContext = dbContext;
         _filterService = filterService;
+        _configuration = configuration;
     }
     
     public async Task AddArticle(AddArticleDTO request)
@@ -31,6 +35,40 @@ public class ArticlesService: IArticlesService
         
         _dbContext.SaveChanges();
     }
+    
+    public async Task<string> AddImage(IFormFile image)
+    {
+        if (image != null && image.Length > 0)
+        {
+            var allowedTypes = new[] { "image/jpeg", "image/png", "image/gif", "image/webp" };
+            if (!allowedTypes.Contains(image.ContentType.ToLower()))
+            {
+                throw new Exception("Invalid image type.");
+            }
+            
+            var uploadPath = _configuration["Uploads:Path"];
+            var uploadUrl = _configuration["Uploads:URL"];
+
+            var extension = Path.GetExtension(image.FileName);
+            var uniqueFileName = $"{Guid.NewGuid()}{extension}";
+
+            var filePath = Path.Combine(uploadPath, uniqueFileName);
+
+            Directory.CreateDirectory(uploadPath);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await image.CopyToAsync(stream);
+            }
+
+            if (!uploadUrl.EndsWith("/")) uploadUrl += "/";
+            
+            return $"{uploadUrl}{uniqueFileName}";
+        }
+        
+        throw new Exception("Invalid image type.");
+    }
+
 
     public async Task<Article> GetArticle(int articleId)
     {
