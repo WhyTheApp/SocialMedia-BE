@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SocialMedia.API.Requests.Articles;
@@ -19,7 +20,7 @@ public class ArticlesController : ControllerBase
         this.configuration = configuration;
     }
     
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
     [HttpPost("add")]
     public async Task<IActionResult> AddRequest([FromBody] AddArticleRequest request)
     {
@@ -28,6 +29,22 @@ public class ArticlesController : ControllerBase
             await _service.AddArticle(request.ToAddRegisterDTO());
             
             return Ok();
+        }
+        catch
+        {
+            return BadRequest();
+        }
+    }
+    
+    [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
+    [HttpPost("add-image")]
+    public async Task<IActionResult> AddRequest([FromForm] IFormFile image)
+    {
+        try
+        {
+            var imageLink = await _service.AddImage(image);
+            
+            return Ok(imageLink);
         }
         catch
         {
