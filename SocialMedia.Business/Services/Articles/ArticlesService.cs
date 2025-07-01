@@ -36,6 +36,19 @@ public class ArticlesService: IArticlesService
         _dbContext.SaveChanges();
     }
     
+    public async Task EditArticle(EditArticleDTO request)
+    {
+        var article = await _dbContext.Articles.FirstOrDefaultAsync(article => article.ArticleId == request.ArticleId);
+
+        if (article == null)
+            return;
+
+        article.Title = request.Title;
+        article.Content = request.Content;
+        
+        await _dbContext.SaveChangesAsync();
+    }
+    
     public async Task<string> AddImage(IFormFile image)
     {
         if (image != null && image.Length > 0)
