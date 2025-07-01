@@ -31,7 +31,7 @@ public class RegistersController : ControllerBase
         }
     }
     
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
     [HttpGet("getAll")]
     public async Task<IActionResult> GetAllRequests()
     {

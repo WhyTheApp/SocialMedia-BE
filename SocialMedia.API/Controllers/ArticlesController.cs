@@ -1,8 +1,9 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SocialMedia.API.Requests.Articles;
-using SocialMedia.API.Requests.PagingAndFiltering;
 using SocialMedia.Business.Services.Articles;
+using SocialMedia.Business.Services.Authentication;
 
 namespace SocialMedia.API.Controllers;
 
@@ -11,21 +12,55 @@ namespace SocialMedia.API.Controllers;
 public class ArticlesController : ControllerBase
 {
     public IArticlesService _service;
+    private IConfiguration configuration;
 
-    public ArticlesController(IArticlesService exampleService)
+    public ArticlesController(IArticlesService exampleService, IConfiguration configuration)
     {
         _service = exampleService;
+        this.configuration = configuration;
     }
     
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
     [HttpPost("add")]
     public async Task<IActionResult> AddRequest([FromBody] AddArticleRequest request)
     {
         try
         {
-            await _service.AddArticle(request.ToAddRegisterDTO());
+            await _service.AddArticle(request.ToAddArticleDTO());
             
             return Ok();
+        }
+        catch
+        {
+            return BadRequest();
+        }
+    }
+    
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+    [HttpPost("edit")]
+    public async Task<IActionResult> EditRequest([FromBody] EditArticleRequest request)
+    {
+        try
+        {
+            await _service.EditArticle(request.ToEditArticleDTO());
+            
+            return Ok();
+        }
+        catch
+        {
+            return BadRequest();
+        }
+    }
+    
+    [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
+    [HttpPost("add-image")]
+    public async Task<IActionResult> AddRequest([FromForm] IFormFile image)
+    {
+        try
+        {
+            var imageLink = await _service.AddImage(image);
+            
+            return Ok(imageLink);
         }
         catch
         {
@@ -51,6 +86,7 @@ public class ArticlesController : ControllerBase
     [HttpGet("get-latest-article-id")]
     public async Task<IActionResult> GetLatestArticleId()
     {
+        await new EmailerService(configuration).SendVerificationEmailAsync("Catalin Catalin", " letstalk@whythe.app", "2233");
         try
         {
             var article = await _service.GetLatestArticleId();
