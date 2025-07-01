@@ -26,7 +26,23 @@ public class ArticlesController : ControllerBase
     {
         try
         {
-            await _service.AddArticle(request.ToAddRegisterDTO());
+            await _service.AddArticle(request.ToAddArticleDTO());
+            
+            return Ok();
+        }
+        catch
+        {
+            return BadRequest();
+        }
+    }
+    
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+    [HttpPost("edit")]
+    public async Task<IActionResult> EditRequest([FromBody] EditArticleRequest request)
+    {
+        try
+        {
+            await _service.EditArticle(request.ToEditArticleDTO());
             
             return Ok();
         }

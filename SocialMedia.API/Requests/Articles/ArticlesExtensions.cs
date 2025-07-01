@@ -6,11 +6,19 @@ namespace SocialMedia.API.Requests.Articles;
 
 public static class ArticlesExtensions
 {
-    public static AddArticleDTO ToAddRegisterDTO(this AddArticleRequest request) =>
+    public static AddArticleDTO ToAddArticleDTO(this AddArticleRequest request) =>
         new AddArticleDTO
         {
             Title = request.Title,
             Author = request.Author,
+            Content = request.Content
+        };
+    
+    public static EditArticleDTO ToEditArticleDTO(this EditArticleRequest request) =>
+        new EditArticleDTO
+        {
+            ArticleId = request.ArticleId,
+            Title = request.Title,
             Content = request.Content
         };
     

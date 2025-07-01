@@ -8,6 +8,7 @@ namespace SocialMedia.Business.Services.Articles;
 public interface IArticlesService
 {
     Task AddArticle(AddArticleDTO request);
+    Task EditArticle(EditArticleDTO request);
     Task<string> AddImage(IFormFile image);
     Task<Article> GetArticle(int articleId);
     Task<FilterResponse<Article>> GetFilteredArticles(FilterObjectDTO request);
@@ -15,3 +16,4 @@ public interface IArticlesService
     Task<int> GetLatestArticleId();
 }
 
+    
