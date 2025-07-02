@@ -10,5 +10,7 @@ public class ArticlesConfiguration: IEntityTypeConfiguration<Article>
     {
         builder.HasKey(article => article.ArticleId);
         builder.HasIndex(article => article.Date);
+        builder.HasIndex(article => article.Slug)
+            .IsUnique();
     }
 }
