@@ -69,11 +69,16 @@ public class ArticlesController : ControllerBase
     }
     
     [HttpGet("get-article")]
-    public async Task<IActionResult> GetRequest([FromQuery] int articleId)
+    public async Task<IActionResult> GetRequest([FromQuery] int? articleId, [FromQuery] string? slug)
     {
         try
         {
-            var article = await _service.GetArticle(articleId);
+            if (articleId == null && string.IsNullOrWhiteSpace(slug))
+                return BadRequest("Either articleId or slug must be provided.");
+            
+            var article = articleId != null
+                ? await _service.GetArticleById(articleId.Value)
+                : await _service.GetArticleBySlug(slug!);
             
             return Ok(article);
         }
@@ -86,10 +91,24 @@ public class ArticlesController : ControllerBase
     [HttpGet("get-latest-article-id")]
     public async Task<IActionResult> GetLatestArticleId()
     {
-        await new EmailerService(configuration).SendVerificationEmailAsync("Catalin Catalin", " letstalk@whythe.app", "2233");
         try
         {
             var article = await _service.GetLatestArticleId();
+            
+            return Ok(article);
+        }
+        catch
+        {
+            return BadRequest();
+        }
+    }
+    
+    [HttpGet("get-slug-map")]
+    public async Task<IActionResult> GetSlugMap()
+    {
+        try
+        {
+            var article = await _service.GetSlugMap();
             
             return Ok(article);
         }
