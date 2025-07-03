@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -28,6 +29,7 @@ public class ArticlesService: IArticlesService
             .AddAsync(new Article
             {
                 Title = request.Title,
+                Slug = GenerateSlug(request.Title),
                 Author = request.Author,
                 Content = request.Content,
                 Date = DateTime.UtcNow,
@@ -47,6 +49,13 @@ public class ArticlesService: IArticlesService
         article.Content = request.Content;
         
         await _dbContext.SaveChangesAsync();
+    }
+
+    public async Task<List<object>> GetSlugMap()
+    {
+        return await _dbContext.Articles
+            .Select(a => new { id = a.ArticleId, slug = a.Slug })
+            .ToListAsync<object>();
     }
     
     public async Task<string> AddImage(IFormFile image)
@@ -83,7 +92,7 @@ public class ArticlesService: IArticlesService
     }
 
 
-    public async Task<Article> GetArticle(int articleId)
+    public async Task<Article> GetArticleById(int articleId)
     {
         var article = await _dbContext.Articles.Where(article => article.ArticleId == articleId).FirstOrDefaultAsync();
 
@@ -93,6 +102,16 @@ public class ArticlesService: IArticlesService
         return article;
     }
 
+    public async Task<Article> GetArticleBySlug(string slug)
+    {
+        var article = await _dbContext.Articles.Where(article => article.Slug == slug).FirstOrDefaultAsync();
+
+        if (article == null)
+            throw new KeyNotFoundException(); 
+                
+        return article;
+    }
+    
     public async Task<FilterResponse<Article>> GetFilteredArticles(FilterObjectDTO request)
     {
         var articles = await _filterService.Filter(request, _dbContext.Articles);
@@ -115,5 +134,16 @@ public class ArticlesService: IArticlesService
         var articleId = _dbContext.Articles.Max(article => article.ArticleId);
 
         return articleId;
+    }
+    
+    private string GenerateSlug(string title)
+    {
+        var separator = "-";
+
+        var slug = title.ToLowerInvariant();
+        slug = Regex.Replace(slug, @"[^a-z0-9]+", separator);
+        slug = slug.Trim(separator.ToCharArray());
+
+        return slug;
     }
 }
