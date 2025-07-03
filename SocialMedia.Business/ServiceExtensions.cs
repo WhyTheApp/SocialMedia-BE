@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using SocialMedia.Business.Helpers;
 using SocialMedia.Business.Services.Articles;
 using SocialMedia.Business.Services.Authentication;
 using SocialMedia.Business.Services.Filtering;
@@ -17,5 +18,6 @@ public static class ServiceExtensions
         services.AddScoped(typeof(IFilterService<>), typeof(FilterService<>));
         services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
         services.AddScoped<IEmailerService, EmailerService>();
+        services.AddScoped<IUsernameUniquenessChecker, UsernameUniquenessChecker>();
     }
 }

@@ -12,6 +12,7 @@ public static class AuthenticationExtensions
         new LocalRegisterRequestDTO
         {
             Username = request.Username,
+            Name = request.Name,
             Email = request.Email,
             Password = request.Password,
         };
