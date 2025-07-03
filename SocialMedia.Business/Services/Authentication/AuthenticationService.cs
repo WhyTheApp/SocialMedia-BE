@@ -66,6 +66,7 @@ public class AuthenticationService : IAuthenticationService
         {
             Id = uniqueId,
             Username = request.Username,
+            Name = request.Name,
             Email = request.Email,
             PasswordHash = String.Empty,
             RoleStatus = RoleStatus.Unverified,
@@ -207,7 +208,8 @@ public class AuthenticationService : IAuthenticationService
         var claims = new[]
         {
             new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-            new Claim("name", user.Username), 
+            new Claim("username", user.Username), 
+            new Claim("name", user.Name), 
             new Claim("role", user.RoleStatus.ToString()),
             new Claim(JwtRegisteredClaimNames.Iss, _configuration["Jwt:Issuer"]),
             new Claim(JwtRegisteredClaimNames.Aud, _configuration["Jwt:Audience"]),
