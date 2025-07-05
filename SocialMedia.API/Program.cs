@@ -13,6 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddApplicationServices();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHttpClient();
 builder.Services.AddControllers();
 builder.Services.AddValidatorsFromAssemblyContaining<AddRegisterRequestValidator>();
 builder.Services.AddFluentValidationAutoValidation();
@@ -91,6 +92,7 @@ foreach (var serviceType in hostedServiceTypes)
 
 
 var app = builder.Build();
+
 
 app.UseCors("AllowFrontend");
 app.UseHttpsRedirection();

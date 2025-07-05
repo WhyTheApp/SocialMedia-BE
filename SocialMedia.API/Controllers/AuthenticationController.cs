@@ -12,7 +12,7 @@ public class AuthenticationController : ControllerBase
 
     public AuthenticationController(IAuthenticationService authenticationService)
     { 
-        _authenticationService = authenticationService;   
+        _authenticationService = authenticationService;
     }
     
     [HttpPost("login")]
@@ -56,6 +56,31 @@ public class AuthenticationController : ControllerBase
         catch
         {
             return BadRequest();
+        }
+    }
+    
+    [HttpPost("google-login")]
+    public async Task<IActionResult> GoogleLogin([FromBody] OauthRequest request)
+    {
+        try
+        {
+            var response = await _authenticationService.GoogleLogin(request.ToOauthRequestDTO());
+            var refreshToken = _authenticationService.GenerateAndSaveRefreshToken(response.Id);
+            
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Lax,
+            };
+            cookieOptions.Expires = DateTime.UtcNow.AddDays(30);
+            Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
+            
+            return Ok(response);
+        }
+        catch
+        {
+            return Unauthorized();
         }
     }
     
