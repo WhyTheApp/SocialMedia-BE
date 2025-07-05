@@ -202,7 +202,7 @@ public class AuthenticationService : IAuthenticationService
         var name = principal.FindFirstValue("name");
         var googleId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
 
-        var user = await GetOauthUser(email, name, googleId);
+        var user = await GetOauthUser(email, name, googleId, LoginProvider.Google);
 
         return new LoginResponse
         {
@@ -212,11 +212,17 @@ public class AuthenticationService : IAuthenticationService
         };
     }
 
-    private async Task<User> GetOauthUser(string email, string name, string providerId)
+    private async Task<User> GetOauthUser(string email, string name, string providerId, LoginProvider providerName)
     {
         var user = await _dbContext.Users.FirstOrDefaultAsync(u =>
-            u.Provider == LoginProvider.Google && u.ProviderId == providerId);
+            u.Email == email);
 
+        if (user.ProviderId != providerId)
+        {
+            user.Provider = providerName;
+            user.ProviderId = providerId;
+        }
+        
         if (user == null)
         {
             user = new User
@@ -226,7 +232,7 @@ public class AuthenticationService : IAuthenticationService
                 Name = name,
                 Username = GenerateUniqueUsername(name),
                 PasswordHash = String.Empty,
-                Provider = LoginProvider.Google,
+                Provider = providerName,
                 ProviderId = providerId,
                 IsEmailConfirmed = true,
                 RoleStatus = RoleStatus.User,
