@@ -31,4 +31,12 @@ public static class AuthenticationExtensions
             UserId = request.UserId,
             Code = request.Code,
         };
+
+    public static OauthRequestDTO ToOauthRequestDTO(this OauthRequest request) =>
+        new OauthRequestDTO
+        {
+            Code = request.Code,
+            Verifier = request.Verifier,
+            RedirectUri = request.RedirectUri   
+        };
 }
