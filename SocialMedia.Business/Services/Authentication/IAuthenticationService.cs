@@ -7,6 +7,7 @@ public interface IAuthenticationService
 {
     Task<LoginResponse> LoginLocalUserAsync(LocalLoginRequestDTO request);
     Task<LoginResponse> RegisterLocalUser(LocalRegisterRequestDTO request);
+    Task<LoginResponse> GoogleLogin(OauthRequestDTO request);
     Task<RefreshTokenResponse> RefreshJWTToken(string refreshToken);
     Task<LoginResponse> VerifyEmail(VerifyEmailRequestDTO request);
 

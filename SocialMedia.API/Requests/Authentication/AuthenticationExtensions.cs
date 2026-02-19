@@ -12,6 +12,7 @@ public static class AuthenticationExtensions
         new LocalRegisterRequestDTO
         {
             Username = request.Username,
+            Name = request.Name,
             Email = request.Email,
             Password = request.Password,
         };
@@ -29,5 +30,13 @@ public static class AuthenticationExtensions
         {
             UserId = request.UserId,
             Code = request.Code,
+        };
+
+    public static OauthRequestDTO ToOauthRequestDTO(this OauthRequest request) =>
+        new OauthRequestDTO
+        {
+            Code = request.Code,
+            Verifier = request.Verifier,
+            RedirectUri = request.RedirectUri   
         };
 }
